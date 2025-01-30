@@ -45,3 +45,5 @@ env/
 
 # Build files
 *.spec
+__pycache__/
+*.pyc
