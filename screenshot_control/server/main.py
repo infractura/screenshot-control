@@ -1,16 +1,36 @@
 """FastAPI server for screenshot service"""
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, HttpUrl
 from typing import Optional
+import os
+from pathlib import Path
+
 from .service import ScreenshotService
 from ..cli import PRESETS
 
+# Get the current directory
+BASE_DIR = Path(__file__).resolve().parent
+
+# Create the FastAPI app
 app = FastAPI(
     title="Screenshot Control API",
     description="Web screenshot service with multiple presets and formats",
     version="0.1.0"
 )
 
+# Mount static files
+app.mount(
+    "/static",
+    StaticFiles(directory=str(BASE_DIR / "static")),
+    name="static"
+)
+
+# Templates
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+# Initialize screenshot service
 screenshot_service = ScreenshotService()
 
 class ScreenshotRequest(BaseModel):
@@ -20,6 +40,14 @@ class ScreenshotRequest(BaseModel):
     height: Optional[int] = None
     format: Optional[str] = "base64"
     full_page: Optional[bool] = False
+
+@app.get("/")
+async def home(request: Request):
+    """Render the home page"""
+    return templates.TemplateResponse(
+        "pages/screenshot.html",
+        {"request": request}
+    )
 
 @app.get("/presets")
 async def get_presets():
@@ -52,12 +80,6 @@ async def take_screenshot(request: ScreenshotRequest):
     
     if not success:
         raise HTTPException(status_code=500, detail=error)
-    
-    if request.format == "binary":
-        return Response(
-            content=image,
-            media_type="image/png"
-        )
     
     return {
         "success": True,

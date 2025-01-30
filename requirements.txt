@@ -7,6 +7,12 @@ uvicorn>=0.15.0
 aiohttp>=3.8.0
 pydantic>=1.8.0
 
+# Template engine
+jinja2>=3.0.0
+
+# Static files
+python-multipart>=0.0.5
+aiofiles>=0.8.0
+
 # Optional dependencies
-python-multipart  # For file uploads
-python-jose[cryptography]  # For JWT support
+python-jose[cryptography]  # For JWT support if needed later
