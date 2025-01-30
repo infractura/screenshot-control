@@ -1,0 +1,16 @@
+[Unit]
+Description=Screenshot Control API Service
+After=network.target
+
+[Service]
+Type=simple
+User=devopsx
+Group=devopsx
+WorkingDirectory=/opt/screenshot-cntrl/server
+Environment=PYTHONPATH=/opt/screenshot-cntrl
+ExecStart=/opt/.pyenv/versions/3.11.10/bin/uvicorn screenshot_control.server.main:app --host 127.0.0.1 --port 8765
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
